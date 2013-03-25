@@ -12,13 +12,26 @@
     <h1>Tic-Tac-Toe</h1>
   </header>
   <article>
-    <div class="sidebar"></div>
-    <div class="main">
+    <div class="main span6">
       <table class="tic-tac-toe">
         <tr><td></td><td></td><td></td></tr>
         <tr><td></td><td></td><td></td></tr>
         <tr><td></td><td></td><td></td></tr>
       </table>
+    </div>
+    <div class="sidebar span4 offset1">
+      <table class="scoreboard table table-stiped table-hover table-bordered">
+        <caption>Scoreboard</caption>
+        <tr><td>O wins</td><td class="o_wins">0</td></tr>
+        <tr><td>X wins</td><td class="x_wins">0</td></tr>
+        <tr><td>Draws </td><td class="draws">0</td></tr>
+      </table>
+      <button class="btn btn-danger btn-block btn-large">
+        <i class="icon-trash icon-white"></i> Reset Scores
+      </button>
+      <button class="btn btn-primary btn-block btn-large">
+        <i class="icon-refresh icon-white"></i> Start New Game
+      </button>
     </div>
   </article>
   <footer></footer>
