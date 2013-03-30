@@ -15,10 +15,14 @@ table.tic-tac-toe td {
   width: 150px;
   height: 150px;
   border: thick solid black;
-  background-color: blue;
+  background-color: #00c;
   color: white;
-  font-family: "Courier New", Courier, monospaced;
+  font-family: "Courier New", Courier, monospace;
   font-size: 72px;
   text-align: center;
   font-weight: bolder;
+}
+
+table.tic-tac-toe td:hover {
+  background-color: #00f;
 }

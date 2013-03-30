@@ -1,18 +1,22 @@
 var TicTacToe = {};
 
-TicTacToe.start = function () {
+TicTacToe.init = function () {
   this.grid = [[], [], []];
   this.emptyCells = 9;
   this.gameIsOver = false;
   this.isDraw = false;
-  this.player = 'O';
+  this.player = 'X';
 
-  for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < 3; i++)
     for (var j = 0; j < 3; j++)
       this.grid[i][j] = ' ';
+
+  if (Math.random() > Math.random()) {
+    this.switchPlayer();
+    this.aiPlay();
   }
 
-  $('.tic-tac-toe td').text(' ');
+  this.redraw();
 };
 
 TicTacToe.isGameOver = function () {
@@ -49,15 +53,16 @@ TicTacToe.switchPlayer = function () {
   this.player = this.player == 'X' ? 'O' : 'X';
 };
 
-TicTacToe.play = function (row, col, cell) {
+TicTacToe.play = function (row, col) {
   if (this.gameIsOver || this.grid[row][col] != ' ')
-    return;
+    return false;
 
   this.grid[row][col] = this.player;
-  $(cell).text(this.grid[row][col]);
   this.emptyCells--;
 
   this.gameIsOver = this.isGameOver();
+
+  TicTacToe.redraw();
 
   if (this.gameIsOver) {
     alert(this.isDraw ? "It's a draw!" : "Player " + this.player + " wins!");
@@ -68,41 +73,60 @@ TicTacToe.play = function (row, col, cell) {
   }
 
   this.switchPlayer();
+  return true;
 };
 
-var ScoreBoard = {
-  o_wins: 0,
-  x_wins: 0,
-  draws: 0,
+TicTacToe.aiPlay = function () {
+  if (this.gameIsOver) return;
+  var empty = [];
+  for (var i = 0; i < 3; i++)
+    for (var j = 0; j < 3; j++)
+      if (this.grid[i][j] == ' ')
+        empty.push([i, j]);
 
-  reset: function () {
-    this.o_wins = 0;
-    this.x_wins = 0;
-    this.draws = 0;
-    this.redraw();
-  },
+  var cell = empty[Math.floor(Math.random() * empty.length)];
+  TicTacToe.play(cell[0], cell[1]);
+};
 
-  redraw: function () {
-    $('.scoreboard .o_wins').text(this.o_wins);
-    $('.scoreboard .x_wins').text(this.x_wins);
-    $('.scoreboard .draws').text(this.draws);
-  },
+TicTacToe.redraw = function () {
+  $('.tic-tac-toe td').each(function () {
+    var row = $(this).parent().index();
+    var col = $(this).index();
+    $(this).text(TicTacToe.grid[row][col]);
+  })
+};
+
+var ScoreBoard = {};
+
+ScoreBoard.init = function () {
+  this.o_wins = 0;
+  this.x_wins = 0;
+  this.draws = 0;
+  this.redraw();
+};
+
+ScoreBoard.redraw = function () {
+  $('.scoreboard .o_wins').text(this.o_wins);
+  $('.scoreboard .x_wins').text(this.x_wins);
+  $('.scoreboard .draws').text(this.draws);
 };
 
 $(function () {
-  TicTacToe.start();
+  TicTacToe.init();
+  ScoreBoard.init();
 
   $('.tic-tac-toe td').click(function () {
     var row = $(this).parent().index();
     var col = $(this).index();
-    TicTacToe.play(row, col, this);
+    if (TicTacToe.play(row, col))
+      TicTacToe.aiPlay();
   });
 
   $('button:contains("Reset")').click(function () {
-    ScoreBoard.reset();
+    ScoreBoard.init();
   })
 
   $('button:contains("Start")').click(function () {
-    TicTacToe.start();
+    TicTacToe.init();
   })
 });
