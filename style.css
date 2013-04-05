@@ -26,3 +26,7 @@ table.tic-tac-toe td {
 table.tic-tac-toe td:hover {
   background-color: #00f;
 }
+
+table.tic-tac-toe td.line {
+  color: red;
+}

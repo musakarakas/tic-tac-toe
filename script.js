@@ -6,6 +6,7 @@ TicTacToe.init = function () {
   this.gameIsOver = false;
   this.isDraw = false;
   this.player = 'X';
+  this.line = -1;
 
   for (var i = 0; i < 3; i++)
     for (var j = 0; j < 3; j++)
@@ -16,6 +17,7 @@ TicTacToe.init = function () {
     this.aiPlay();
   }
 
+  $('.tic-tac-toe td').removeClass('line');
   this.redraw();
 };
 
@@ -36,9 +38,12 @@ TicTacToe.isGameOver = function () {
   }
 
   // Somebody wins if "XXX" or "OOO" is found
-  for (var i = 0; i < 8; i++)
-    if (lines[i] == 'XXX' || lines[i] == 'OOO')
+  for (var i = 0; i < 8; i++) {
+    if (lines[i] == 'XXX' || lines[i] == 'OOO') {
+      this.line = i;
       return true;
+    }
+  }
 
   // Nobody wins and no empty cells
   if (this.emptyCells == 0) {
@@ -89,10 +94,21 @@ TicTacToe.aiPlay = function () {
 };
 
 TicTacToe.redraw = function () {
+  var line = this.line, gameover = this.gameIsOver;
+
   $('.tic-tac-toe td').each(function () {
     var row = $(this).parent().index();
     var col = $(this).index();
     $(this).text(TicTacToe.grid[row][col]);
+
+    if (gameover) {
+      // Highlight if 3-in-a-row
+      if (row == line ||               // horizontal
+          col == line - 3 ||           // vertical
+          row == col && line == 6 ||   // \-diagonal
+          row == 2 - col && line == 7) // /-diagonal
+        $(this).addClass('line');
+    }
   })
 };
 
