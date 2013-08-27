@@ -12,7 +12,7 @@ TicTacToe.init = function () {
     for (var j = 0; j < 3; j++)
       this.grid[i][j] = ' ';
 
-  if (Math.random() > Math.random()) {
+  if (Math.random() > .5) {
     this.switchPlayer();
     this.aiPlay();
   }
@@ -39,14 +39,14 @@ TicTacToe.isGameOver = function () {
 
   // Somebody wins if "XXX" or "OOO" is found
   for (var i = 0; i < 8; i++) {
-    if (lines[i] == 'XXX' || lines[i] == 'OOO') {
+    if (lines[i] === 'XXX' || lines[i] === 'OOO') {
       this.line = i;
       return true;
     }
   }
 
   // Nobody wins and no empty cells
-  if (this.emptyCells == 0) {
+  if (this.emptyCells === 0) {
     this.isDraw = true;
     return true;
   }
@@ -55,11 +55,11 @@ TicTacToe.isGameOver = function () {
 };
 
 TicTacToe.switchPlayer = function () {
-  this.player = this.player == 'X' ? 'O' : 'X';
+  this.player = this.player === 'X' ? 'O' : 'X';
 };
 
 TicTacToe.play = function (row, col) {
-  if (this.gameIsOver || this.grid[row][col] != ' ')
+  if (this.gameIsOver || this.grid[row][col] !== ' ')
     return false;
 
   this.grid[row][col] = this.player;
@@ -72,8 +72,8 @@ TicTacToe.play = function (row, col) {
   if (this.gameIsOver) {
     alert(this.isDraw ? "It's a draw!" : "Player " + this.player + " wins!");
     if      (this.isDraw)        ScoreBoard.draws++;
-    else if (this.player == 'X') ScoreBoard.x_wins++;
-    else if (this.player == 'O') ScoreBoard.o_wins++;
+    else if (this.player === 'X') ScoreBoard.x_wins++;
+    else if (this.player === 'O') ScoreBoard.o_wins++;
     ScoreBoard.redraw();
   }
 
@@ -86,7 +86,7 @@ TicTacToe.aiPlay = function () {
   var empty = [];
   for (var i = 0; i < 3; i++)
     for (var j = 0; j < 3; j++)
-      if (this.grid[i][j] == ' ')
+      if (this.grid[i][j] === ' ')
         empty.push([i, j]);
 
   var cell = empty[Math.floor(Math.random() * empty.length)];
@@ -103,13 +103,13 @@ TicTacToe.redraw = function () {
 
     if (gameover) {
       // Highlight if 3-in-a-row
-      if (row == line ||               // horizontal
-          col == line - 3 ||           // vertical
-          row == col && line == 6 ||   // \-diagonal
-          row == 2 - col && line == 7) // /-diagonal
+      if (row === line ||               // horizontal
+          col === line - 3 ||           // vertical
+          row === col && line === 6 ||   // \-diagonal
+          row === 2 - col && line === 7) // /-diagonal
         $(this).addClass('line');
     }
-  })
+  });
 };
 
 var ScoreBoard = {};
@@ -140,9 +140,9 @@ $(function () {
 
   $('button:contains("Reset")').click(function () {
     ScoreBoard.init();
-  })
+  });
 
   $('button:contains("Start")').click(function () {
     TicTacToe.init();
-  })
+  });
 });
