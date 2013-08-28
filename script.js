@@ -1,4 +1,5 @@
-var TicTacToe = {};
+function GameCtrl($scope) {
+var TicTacToe = $scope.TicTacToe = {};
 
 TicTacToe.init = function() {
   this.grid = [[], [], []];
@@ -74,7 +75,7 @@ TicTacToe.play = function(row, col) {
     if (this.isDraw) ScoreBoard.draws++;
     else if (this.player === 'X') ScoreBoard.x_wins++;
     else if (this.player === 'O') ScoreBoard.o_wins++;
-    ScoreBoard.redraw();
+    $scope.$digest();
   }
 
   this.switchPlayer();
@@ -112,37 +113,23 @@ TicTacToe.redraw = function() {
   });
 };
 
-var ScoreBoard = {};
+var ScoreBoard = $scope.ScoreBoard = {};
 
 ScoreBoard.init = function() {
   this.o_wins = 0;
   this.x_wins = 0;
   this.draws = 0;
-  this.redraw();
 };
 
-ScoreBoard.redraw = function() {
-  $('.scoreboard .o_wins').text(this.o_wins);
-  $('.scoreboard .x_wins').text(this.x_wins);
-  $('.scoreboard .draws').text(this.draws);
-};
+TicTacToe.init();
+ScoreBoard.init();
 
 $(function() {
-  TicTacToe.init();
-  ScoreBoard.init();
-
   $('.tic-tac-toe td').click(function() {
     var row = $(this).parent().index();
     var col = $(this).index();
     if (TicTacToe.play(row, col))
       TicTacToe.aiPlay();
   });
-
-  $('button:contains("Reset")').click(function() {
-    ScoreBoard.init();
-  });
-
-  $('button:contains("Start")').click(function() {
-    TicTacToe.init();
-  });
 });
+}
