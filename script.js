@@ -17,9 +17,6 @@ function GameCtrl($scope) {
       this.switchPlayer();
       this.aiPlay();
     }
-
-    $('.tic-tac-toe td').removeClass('line');
-    this.redraw();
   };
 
   TicTacToe.isGameOver = function() {
@@ -68,14 +65,11 @@ function GameCtrl($scope) {
 
     this.gameIsOver = this.isGameOver();
 
-    TicTacToe.redraw();
-
     if (this.gameIsOver) {
       alert(this.isDraw ? "It's a draw!" : "Player " + this.player + " wins!");
       if (this.isDraw) ScoreBoard.draws++;
       else if (this.player === 'X') ScoreBoard.x_wins++;
       else if (this.player === 'O') ScoreBoard.o_wins++;
-      $scope.$digest();
     }
 
     this.switchPlayer();
@@ -94,23 +88,20 @@ function GameCtrl($scope) {
     TicTacToe.play(cell[0], cell[1]);
   };
 
-  TicTacToe.redraw = function() {
+  TicTacToe.isLine = function(row, col) {
     var line = this.line, gameover = this.gameIsOver;
 
-    $('.tic-tac-toe td').each(function() {
-      var row = $(this).parent().index();
-      var col = $(this).index();
-      $(this).text(TicTacToe.grid[row][col]);
+    return gameover && (
+            row === line || // horizontal
+            col === line - 3 || // vertical
+            row === col && line === 6 || // \-diagonal
+            row === 2 - col && line === 7 // /-diagonal
+            );
+  };
 
-      if (gameover) {
-        // Highlight if 3-in-a-row
-        if (row === line || // horizontal
-                col === line - 3 || // vertical
-                row === col && line === 6 || // \-diagonal
-                row === 2 - col && line === 7) // /-diagonal
-          $(this).addClass('line');
-      }
-    });
+  TicTacToe.click = function(row, col) {
+    if (TicTacToe.play(row, col))
+      TicTacToe.aiPlay();
   };
 
   var ScoreBoard = $scope.ScoreBoard = {};
@@ -123,13 +114,4 @@ function GameCtrl($scope) {
 
   TicTacToe.init();
   ScoreBoard.init();
-
-  $(function() {
-    $('.tic-tac-toe td').click(function() {
-      var row = $(this).parent().index();
-      var col = $(this).index();
-      if (TicTacToe.play(row, col))
-        TicTacToe.aiPlay();
-    });
-  });
 }

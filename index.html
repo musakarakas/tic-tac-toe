@@ -4,9 +4,8 @@
     <title>Tic-Tac-Toe</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" />
     <link rel="stylesheet" href="style.css" />
-    <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
     <script src="script.js"></script>
   </head>
   <body data-ng-app data-ng-controller="GameCtrl">
@@ -16,9 +15,13 @@
     <article>
       <div class="main span6">
         <table class="tic-tac-toe">
-          <tr><td></td><td></td><td></td></tr>
-          <tr><td></td><td></td><td></td></tr>
-          <tr><td></td><td></td><td></td></tr>
+          <tr data-ng-repeat="row in TicTacToe.grid">
+            <td data-ng-repeat="cell in row"
+                data-ng-click="TicTacToe.click($parent.$index, $index)"
+                class="line-{{TicTacToe.isLine($parent.$index, $index)}}">
+              {{cell}}
+            </td>
+          </tr>
         </table>
       </div>
       <div class="sidebar span4 offset1">
