@@ -1,7 +1,10 @@
 function GameCtrl($scope) {
-  var TicTacToe = $scope.TicTacToe = {};
+  $scope.init = function() {
+    this.reset_game();
+    this.reset_scores();
+  };
 
-  TicTacToe.init = function() {
+  $scope.reset_game = function() {
     this.grid = [[], [], []];
     this.emptyCells = 9;
     this.gameIsOver = false;
@@ -19,7 +22,7 @@ function GameCtrl($scope) {
     }
   };
 
-  TicTacToe.isGameOver = function() {
+  $scope.isGameOver = function() {
     // 3 rows + 3 columns + 2 diagonals
     var lines = new Array(8);
 
@@ -52,11 +55,11 @@ function GameCtrl($scope) {
     return false;
   };
 
-  TicTacToe.switchPlayer = function() {
+  $scope.switchPlayer = function() {
     this.player = this.player === 'X' ? 'O' : 'X';
   };
 
-  TicTacToe.play = function(row, col) {
+  $scope.play = function(row, col) {
     if (this.gameIsOver || this.grid[row][col] !== ' ')
       return false;
 
@@ -67,16 +70,16 @@ function GameCtrl($scope) {
 
     if (this.gameIsOver) {
       alert(this.isDraw ? "It's a draw!" : "Player " + this.player + " wins!");
-      if (this.isDraw) ScoreBoard.draws++;
-      else if (this.player === 'X') ScoreBoard.x_wins++;
-      else if (this.player === 'O') ScoreBoard.o_wins++;
+      if (this.isDraw) this.draws++;
+      else if (this.player === 'X') this.x_wins++;
+      else if (this.player === 'O') this.o_wins++;
     }
 
     this.switchPlayer();
     return true;
   };
 
-  TicTacToe.aiPlay = function() {
+  $scope.aiPlay = function() {
     if (this.gameIsOver) return;
     var empty = [];
     for (var i = 0; i < 3; i++)
@@ -85,10 +88,10 @@ function GameCtrl($scope) {
           empty.push([i, j]);
 
     var cell = empty[Math.floor(Math.random() * empty.length)];
-    TicTacToe.play(cell[0], cell[1]);
+    this.play(cell[0], cell[1]);
   };
 
-  TicTacToe.isLine = function(row, col) {
+  $scope.isLine = function(row, col) {
     var line = this.line, gameover = this.gameIsOver;
 
     return gameover && (
@@ -99,19 +102,16 @@ function GameCtrl($scope) {
             );
   };
 
-  TicTacToe.click = function(row, col) {
-    if (TicTacToe.play(row, col))
-      TicTacToe.aiPlay();
+  $scope.click = function(row, col) {
+    if ($scope.play(row, col))
+      $scope.aiPlay();
   };
 
-  var ScoreBoard = $scope.ScoreBoard = {};
-
-  ScoreBoard.init = function() {
+  $scope.reset_scores = function() {
     this.o_wins = 0;
     this.x_wins = 0;
     this.draws = 0;
   };
 
-  TicTacToe.init();
-  ScoreBoard.init();
+  $scope.init();
 }

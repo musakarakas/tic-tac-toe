@@ -15,10 +15,10 @@
     <article>
       <div class="main span6">
         <table class="tic-tac-toe">
-          <tr data-ng-repeat="row in TicTacToe.grid">
+          <tr data-ng-repeat="row in grid">
             <td data-ng-repeat="cell in row"
-                data-ng-click="TicTacToe.click($parent.$index, $index)"
-                class="line-{{TicTacToe.isLine($parent.$index, $index)}}">
+                data-ng-click="click($parent.$index, $index)"
+                class="line-{{isLine($parent.$index, $index)}}">
               {{cell}}
             </td>
           </tr>
@@ -27,14 +27,14 @@
       <div class="sidebar span4 offset1">
         <table class="scoreboard table table-stiped table-hover table-bordered">
           <caption>Scoreboard</caption>
-          <tr><td>X wins</td><td>{{ScoreBoard.x_wins}}</td></tr>
-          <tr><td>O wins</td><td>{{ScoreBoard.o_wins}}</td></tr>
-          <tr><td>Draws </td><td>{{ScoreBoard.draws}}</td></tr>
+          <tr><td>X wins</td><td>{{x_wins}}</td></tr>
+          <tr><td>O wins</td><td>{{o_wins}}</td></tr>
+          <tr><td>Draws </td><td>{{draws}}</td></tr>
         </table>
-        <button class="btn btn-danger btn-block btn-large" data-ng-click="ScoreBoard.init()">
+        <button class="btn btn-danger btn-block btn-large" data-ng-click="reset_scores()">
           <i class="icon-trash icon-white"></i> Reset Scores
         </button>
-        <button class="btn btn-primary btn-block btn-large" data-ng-click="TicTacToe.init()">
+        <button class="btn btn-primary btn-block btn-large" data-ng-click="reset_game()">
           <i class="icon-refresh icon-white"></i> Start New Game
         </button>
       </div>
