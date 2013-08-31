@@ -1,10 +1,12 @@
 function GameCtrl($scope) {
-  $scope.init = function() {
+  var Game = $scope.game = {};
+
+  Game.init = function() {
     this.reset_game();
     this.reset_scores();
   };
 
-  $scope.reset_game = function() {
+  Game.reset_game = function() {
     this.grid = [[], [], []];
     this.emptyCells = 9;
     this.gameIsOver = false;
@@ -22,7 +24,7 @@ function GameCtrl($scope) {
     }
   };
 
-  $scope.isGameOver = function() {
+  Game.isGameOver = function() {
     // 3 rows + 3 columns + 2 diagonals
     var lines = new Array(8);
 
@@ -55,11 +57,11 @@ function GameCtrl($scope) {
     return false;
   };
 
-  $scope.switchPlayer = function() {
+  Game.switchPlayer = function() {
     this.player = this.player === 'X' ? 'O' : 'X';
   };
 
-  $scope.play = function(row, col) {
+  Game.play = function(row, col) {
     if (this.gameIsOver || this.grid[row][col] !== ' ')
       return false;
 
@@ -79,7 +81,7 @@ function GameCtrl($scope) {
     return true;
   };
 
-  $scope.aiPlay = function() {
+  Game.aiPlay = function() {
     if (this.gameIsOver) return;
     var empty = [];
     for (var i = 0; i < 3; i++)
@@ -91,7 +93,7 @@ function GameCtrl($scope) {
     this.play(cell[0], cell[1]);
   };
 
-  $scope.isLine = function(row, col) {
+  Game.isLine = function(row, col) {
     var line = this.line, gameover = this.gameIsOver;
 
     return gameover && (
@@ -102,16 +104,16 @@ function GameCtrl($scope) {
             );
   };
 
-  $scope.click = function(row, col) {
-    if ($scope.play(row, col))
-      $scope.aiPlay();
+  Game.click = function(row, col) {
+    if (Game.play(row, col))
+      Game.aiPlay();
   };
 
-  $scope.reset_scores = function() {
+  Game.reset_scores = function() {
     this.o_wins = 0;
     this.x_wins = 0;
     this.draws = 0;
   };
 
-  $scope.init();
+  Game.init();
 }
