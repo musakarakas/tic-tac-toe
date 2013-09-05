@@ -1,119 +1,270 @@
-function GameCtrl($scope) {
-  var Game = $scope.game = {};
+function GameCtrl ($scope) {
+  'use strict';
+  var Game, AI, Scores, Chains, grid;
+  init();
 
-  Game.init = function() {
-    this.reset_game();
-    this.reset_scores();
-  };
+  function init () {
+    AI = load_ai();
+    Scores = $scope.scores = load_scores();
+    Chains = load_chains();
+    Game = $scope.game = load_game();
+  }
 
-  Game.reset_game = function() {
-    this.grid = [[], [], []];
-    this.emptyCells = 9;
-    this.gameIsOver = false;
-    this.isDraw = false;
-    this.player = 'X';
-    this.line = -1;
+  function load_game () {
+    var gameover, result, current_player;
 
-    for (var i = 0; i < 3; i++)
-      for (var j = 0; j < 3; j++)
-        this.grid[i][j] = ' ';
+    init();
+    return {is_over: is_over, get_result: get_result,
+      restart: restart, update_status: update_status,
+      get_current_player: get_current_player, switch_player: switch_player};
 
-    if (Math.random() > .5) {
-      this.switchPlayer();
-      this.aiPlay();
-    }
-  };
-
-  Game.isGameOver = function() {
-    // 3 rows + 3 columns + 2 diagonals
-    var lines = new Array(8);
-
-    for (var i = 0; i < 8; i++)
-      lines[i] = '';
-
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 3; j++) {
-        lines[i] += this.grid[i][j];
-        lines[i + 3] += this.grid[j][i];
-      }
-      lines[6] += this.grid[i][i];
-      lines[7] += this.grid[i][2 - i];
+    function init () {
+      reset();
     }
 
-    // Somebody wins if "XXX" or "OOO" is found
-    for (var i = 0; i < 8; i++) {
-      if (lines[i] === 'XXX' || lines[i] === 'OOO') {
-        this.line = i;
-        return true;
+    function restart () {
+      reset();
+      start();
+    }
+
+    function reset () {
+      current_player = 'X';
+      gameover = false;
+      result = '';
+      grid = $scope.grid = new Grid(3);
+      Chains.reset();
+    }
+
+    function start () {
+      if (Math.random() > 0.5) {
+        switch_player();
+        AI.play();
       }
     }
 
-    // Nobody wins and no empty cells
-    if (this.emptyCells === 0) {
-      this.isDraw = true;
+    function end (winner) {
+      if (winner) {
+        result = winner.toLowerCase() + '_wins';
+        ++Scores[result];
+      } else {
+        result = 'tied';
+        ++Scores.ties;
+      }
+      gameover = true;
+    }
+
+    function is_over () {
+      return gameover;
+    }
+
+    function get_result () {
+      return result;
+    }
+
+    function get_current_player () {
+      return current_player;
+    }
+
+    function update_status () {
+      var longest_chain = Chains.longest(), longest_length, winner;
+      if (longest_chain) {
+        longest_length = longest_chain.length;
+        winner = longest_chain.owner;
+      }
+      if (longest_length === 3)
+        end(winner);
+      else if (grid.is_full())
+        end();
+    }
+
+    function switch_player () {
+      current_player = current_player === 'X' ? 'O' : 'X';
+    }
+  }
+
+  function load_ai () {
+    var random = {
+      play: function () {
+        var blanks = grid.get_blank_cells();
+        var cell = blanks[Math.floor(Math.random() * blanks.length)];
+        cell.play();
+      }
+    };
+    var defensive = {
+      play: function () {
+      }
+    };
+    return random;
+  }
+
+  function load_scores () {
+    var scores = {
+      reset: function () {
+        this.x_wins = this.o_wins = this.ties = 0;
+      }
+    };
+    scores.reset();
+    return scores;
+  }
+
+  function load_chains () {
+    var chains;
+    init();
+    return {reset: reset, longest: longest,
+      digest: digest, add: add, remove: remove};
+
+    function init () {
+      reset();
+    }
+
+    function reset () {
+      chains = [];
+    }
+
+    function longest () {
+      if (!chains.length) return null;
+      var longest = chains[0];
+      for (var i = 1; i < chains.length; i++)
+        if (chains[i].length > longest.length)
+          longest = chains[i];
+      return longest;
+    }
+
+    function digest (cell) {
+      var neighbors = grid.get_neighbors_of(cell);
+      for (var i = 0; i < 4; i++) {
+        bind(neighbors[i], cell, i);
+        bind(cell, neighbors[i + 4], i);
+      }
+    }
+
+    function bind (cell1, cell2, direction) {
+      if (!cell1 || !cell2 || !cell1.owner || cell1.owner !== cell2.owner)
+        return false;
+      if (!cell1.chains[direction])
+        cell1.chains[direction] = new Chain(cell1, direction);
+      cell1.chains[direction].bind(cell2);
       return true;
     }
 
-    return false;
-  };
-
-  Game.switchPlayer = function() {
-    this.player = this.player === 'X' ? 'O' : 'X';
-  };
-
-  Game.play = function(row, col) {
-    if (this.gameIsOver || this.grid[row][col] !== ' ')
-      return false;
-
-    this.grid[row][col] = this.player;
-    this.emptyCells--;
-
-    this.gameIsOver = this.isGameOver();
-
-    if (this.gameIsOver) {
-      alert(this.isDraw ? "It's a draw!" : "Player " + this.player + " wins!");
-      if (this.isDraw) this.draws++;
-      else if (this.player === 'X') this.x_wins++;
-      else if (this.player === 'O') this.o_wins++;
+    function add (chain) {
+      if (chains.indexOf(chain) === -1)
+        chains.push(chain);
     }
 
-    this.switchPlayer();
-    return true;
-  };
+    function remove (chain) {
+      var i = chains.indexOf(chain);
+      if (i !== -1) chains.splice(i, 1);
+    }
 
-  Game.aiPlay = function() {
-    if (this.gameIsOver) return;
-    var empty = [];
-    for (var i = 0; i < 3; i++)
-      for (var j = 0; j < 3; j++)
-        if (this.grid[i][j] === ' ')
-          empty.push([i, j]);
+    function Chain (cell, direction) {
+      var cells = this.cells = [cell];
+      this.bind = bind;
 
-    var cell = empty[Math.floor(Math.random() * empty.length)];
-    this.play(cell[0], cell[1]);
-  };
+      Object.defineProperties(this, {
+        length: {get: get_length},
+        owner: {get: get_owner}
+      });
 
-  Game.isLine = function(row, col) {
-    var line = this.line, gameover = this.gameIsOver;
+      Chains.add(this);
 
-    return gameover && (
-            row === line || // horizontal
-            col === line - 3 || // vertical
-            row === col && line === 6 || // \-diagonal
-            row === 2 - col && line === 7 // /-diagonal
-            );
-  };
+      var self = this;
 
-  Game.click = function(row, col) {
-    if (Game.play(row, col))
-      Game.aiPlay();
-  };
+      function add (cell) {
+        cell.chains[direction] = self;
+        cells.push(cell);
+      }
 
-  Game.reset_scores = function() {
-    this.o_wins = 0;
-    this.x_wins = 0;
-    this.draws = 0;
-  };
+      function bind (cell) {
+        if (cell.chains[direction]) merge(cell.chains[direction]);
+        else add(cell);
+      }
 
-  Game.init();
+      function merge (chain) {
+        for (var i = 0; i < chain.length; i++)
+          add(chain.cells[i]);
+        Chains.remove(chain);
+      }
+
+      function get_length () {
+        return cells.length;
+      }
+      function get_owner () {
+        return cells[0].owner;
+      }
+    }
+  }
+
+  function Grid (size) {
+    var cells = this.cells = [];
+    this.is_full = is_full;
+    this.get_blank_cells = get_blank_cells;
+    this.get_neighbors_of = get_neighbors_of;
+
+    for (var i = 0; i < size; i++) {
+      cells[i] = [];
+      for (var j = 0; j < size; j++)
+        cells[i][j] = new Cell();
+    }
+
+    function get_neighbors_of (cell) {
+      var index = find(cell), i = index.row, j = index.col;
+      return [
+        cells[i][j - 1], // W ←
+        cells[i - 1] && cells[i - 1][j - 1], // NW ↖
+        cells[i - 1] && cells[i - 1][j], // N ↑
+        cells[i - 1] && cells[i - 1][j + 1], // NE ↗
+        cells[i][j + 1], // E →
+        cells[i + 1] && cells[i + 1][j + 1], // SE ↘
+        cells[i + 1] && cells[i + 1][j], // S ↓
+        cells[i + 1] && cells[i + 1][j - 1]  // SW ↙
+      ];
+    }
+
+    function find (cell) {
+      for (var i = 0; i < size; i++)
+        for (var j = 0; j < size; j++)
+          if (cells[i][j] === cell)
+            return {row: i, col: j};
+      return {row: -1, col: -1};
+    }
+
+    function is_full () {
+      return !get_blank_cells().length;
+    }
+
+    function get_blank_cells () {
+      var blanks = [];
+      for (var i = 0; i < size; i++)
+        for (var j = 0; j < size; j++)
+          if (!cells[i][j].owner)
+            blanks.push(cells[i][j]);
+      return blanks;
+    }
+
+    function Cell () {
+      var chains = this.chains = [];
+
+      this.click = function () {
+        if (this.play() && !Game.is_over()) AI.play();
+      };
+
+      this.play = function () {
+        if (Game.is_over() || this.owner) return false;
+        this.owner = Game.get_current_player();
+        Chains.digest(this);
+        Game.update_status();
+        Game.switch_player();
+        return true;
+      };
+
+      this.max_chain_length = function () {
+        var max = 0;
+        for (var i = 0; i < chains.length; i++)
+          if (chains[i] && chains[i].length > max)
+            max = chains[i].length;
+        return max;
+      };
+    }
+  }
 }
