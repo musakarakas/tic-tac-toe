@@ -4,11 +4,10 @@
     <title>Tic-Tac-Toe</title>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" />
     <link rel="stylesheet" href="style.css" />
-    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
     <script src="script.js"></script>
   </head>
-  <body data-ng-app data-ng-controller="GameCtrl">
+  <body data-ng-app="TicTacToe" data-ng-controller="TicTacToeCtrl">
     <header>
       <h1>Tic-Tac-Toe</h1>
     </header>
@@ -17,9 +16,9 @@
         <table class="tic-tac-toe">
           <tr data-ng-repeat="row in grid.cells">
             <td data-ng-repeat="cell in row"
-                data-ng-click="cell.click()"
-                class="chain-{{cell.max_chain_length()}}">
-              {{cell.owner}}
+                data-ng-click="game.click(cell)"
+                class="chain-{{chains.longest(cell).length}}">
+              {{cell.owner | uppercase}}
             </td>
           </tr>
         </table>
@@ -27,15 +26,9 @@
       <div class="sidebar span4 offset2">
         <table class="scoreboard table table-stiped table-hover table-bordered">
           <caption>Scoreboard</caption>
-          <tr data-ng-class="{highlight: game.get_result() == 'x_wins'}">
-            <td>X wins</td><td>{{scores.x_wins}}</td>
-          </tr>
-          <tr data-ng-class="{highlight: game.get_result() == 'o_wins'}">
-            <td>O wins</td><td>{{scores.o_wins}}</td>
-          </tr>
-          <tr data-ng-class="{highlight: game.get_result() == 'tied'}">
-            <td>Ties </td><td>{{scores.ties}}</td>
-          </tr>
+          <tr data-highlight="x_wins"><td>X wins</td><td>{{scores.x_wins}}</td></tr>
+          <tr data-highlight="o_wins"><td>O wins</td><td>{{scores.o_wins}}</td></tr>
+          <tr data-highlight="ties"><td>Ties </td><td>{{scores.ties}}</td></tr>
         </table>
         <button class="btn btn-danger btn-block btn-large" data-ng-click="scores.reset()">
           <i class="icon-trash icon-white"></i> Reset Scores

@@ -1,22 +1,39 @@
-function GameCtrl ($scope) {
+var TicTacToe = angular.module('TicTacToe', []);
+
+TicTacToe.directive("highlight", function () {
   'use strict';
-  var Game, AI, Scores, Chains, grid;
+
+  return function (scope, element, attrs) {
+    scope.$watch("game.result", function (value) {
+      element.toggleClass('highlight', value === attrs.highlight);
+    });
+  };
+});
+
+TicTacToe.controller('TicTacToeCtrl', function ($scope) {
+  'use strict';
+
+  var AI, Scores, Chains, grid;
   init();
 
   function init () {
     AI = load_ai();
     Scores = $scope.scores = load_scores();
-    Chains = load_chains();
-    Game = $scope.game = load_game();
+    Chains = $scope.chains = load_chains();
+    $scope.game = load_game();
   }
 
   function load_game () {
-    var gameover, result, current_player;
+    var current_player, result, gameover;
 
     init();
-    return {is_over: is_over, get_result: get_result,
-      restart: restart, update_status: update_status,
-      get_current_player: get_current_player, switch_player: switch_player};
+    return {
+      restart: restart,
+      click: click,
+      get result () {
+        return result;
+      }
+    };
 
     function init () {
       reset();
@@ -28,7 +45,7 @@ function GameCtrl ($scope) {
     }
 
     function reset () {
-      current_player = 'X';
+      current_player = 'x';
       gameover = false;
       result = '';
       grid = $scope.grid = new Grid(3);
@@ -38,31 +55,27 @@ function GameCtrl ($scope) {
     function start () {
       if (Math.random() > 0.5) {
         switch_player();
-        AI.play();
+        play(AI.pick_cell());
       }
     }
 
     function end (winner) {
-      if (winner) {
-        result = winner.toLowerCase() + '_wins';
-        ++Scores[result];
-      } else {
-        result = 'tied';
-        ++Scores.ties;
-      }
+      result = winner ? winner + '_wins' : 'ties';
+      Scores[result]++;
       gameover = true;
     }
 
-    function is_over () {
-      return gameover;
+    function click (cell) {
+      play(cell) && play(AI.pick_cell());
     }
 
-    function get_result () {
-      return result;
-    }
-
-    function get_current_player () {
-      return current_player;
+    function play (cell) {
+      if (gameover || cell.owner) return false;
+      cell.owner = current_player;
+      Chains.digest(cell);
+      update_status();
+      switch_player();
+      return true;
     }
 
     function update_status () {
@@ -78,20 +91,20 @@ function GameCtrl ($scope) {
     }
 
     function switch_player () {
-      current_player = current_player === 'X' ? 'O' : 'X';
+      current_player = current_player === 'x' ? 'o' : 'x';
     }
   }
 
   function load_ai () {
     var random = {
-      play: function () {
+      pick_cell: function () {
         var blanks = grid.get_blank_cells();
         var cell = blanks[Math.floor(Math.random() * blanks.length)];
-        cell.play();
+        return cell;
       }
     };
     var defensive = {
-      play: function () {
+      pick_cell: function () {
       }
     };
     return random;
@@ -121,7 +134,13 @@ function GameCtrl ($scope) {
       chains = [];
     }
 
-    function longest () {
+    // Returns the longest chain that contains 'cell'
+    function longest (cell) {
+      return longest_of(filter(cell));
+    }
+
+    // Returns the longest chain in 'chains'
+    function longest_of (chains) {
       if (!chains.length) return null;
       var longest = chains[0];
       for (var i = 1; i < chains.length; i++)
@@ -130,6 +149,18 @@ function GameCtrl ($scope) {
       return longest;
     }
 
+    // Returns an array of chains that contain 'cell'
+    function filter (cell) {
+      if (!cell) return chains;
+
+      var filtered = [];
+      for (var i = 0; i < chains.length; i++)
+        if (chains[i].cells.indexOf(cell) !== -1)
+          filtered.push(chains[i]);
+      return filtered;
+    }
+
+    // Updates chain bindings of cell
     function digest (cell) {
       var neighbors = grid.get_neighbors_of(cell);
       for (var i = 0; i < 4; i++) {
@@ -138,6 +169,7 @@ function GameCtrl ($scope) {
       }
     }
 
+    // Binds 'cell1' to 'cell2' with a chain in 'direction'
     function bind (cell1, cell2, direction) {
       if (!cell1 || !cell2 || !cell1.owner || cell1.owner !== cell2.owner)
         return false;
@@ -204,7 +236,7 @@ function GameCtrl ($scope) {
     for (var i = 0; i < size; i++) {
       cells[i] = [];
       for (var j = 0; j < size; j++)
-        cells[i][j] = new Cell();
+        cells[i][j] = {owner: null, chains: []};
     }
 
     function get_neighbors_of (cell) {
@@ -241,30 +273,5 @@ function GameCtrl ($scope) {
             blanks.push(cells[i][j]);
       return blanks;
     }
-
-    function Cell () {
-      var chains = this.chains = [];
-
-      this.click = function () {
-        if (this.play() && !Game.is_over()) AI.play();
-      };
-
-      this.play = function () {
-        if (Game.is_over() || this.owner) return false;
-        this.owner = Game.get_current_player();
-        Chains.digest(this);
-        Game.update_status();
-        Game.switch_player();
-        return true;
-      };
-
-      this.max_chain_length = function () {
-        var max = 0;
-        for (var i = 0; i < chains.length; i++)
-          if (chains[i] && chains[i].length > max)
-            max = chains[i].length;
-        return max;
-      };
-    }
   }
-}
+});
