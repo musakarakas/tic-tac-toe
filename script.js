@@ -135,33 +135,20 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
 
     // Returns the longest chain that contains 'cell'
     function longest (cell) {
-      return longest_of(filter(cell));
-    }
-
-    // Returns the longest chain in 'chains'
-    function longest_of (chains) {
-      if (!chains.length) return null;
-      var longest = chains[0];
-      for (var i = 1; i < chains.length; i++)
-        if (chains[i].length > longest.length)
-          longest = chains[i];
-      return longest;
+      var _chains = cell ? filter(cell) : chains;
+      if (!_chains.length) return null;
+      return _.max(_chains, function (chain) { return chain.length; });
     }
 
     // Returns an array of chains that contain 'cell'
     function filter (cell) {
-      var filtered = [];
-      for (var i = 0; i < chains.length; i++)
-        if (!cell || chains[i].contains(cell))
-          filtered.push(chains[i]);
-      return filtered;
+      return _.filter(chains, function (chain) { return chain.contains(cell); });
     }
 
     function find (cell, direction) {
-      for (var i = 0; i < chains.length; i++)
-        if (chains[i].direction === direction && chains[i].contains(cell))
-          return chains[i];
-      return null;
+      return _.find(chains, function (chain) {
+        return chain.direction === direction && chain.contains(cell);
+      });
     }
 
     // Updates chain bindings of cell
@@ -182,7 +169,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     }
 
     function add (chain) {
-      if (chains.indexOf(chain) === -1)
+      if (!_.contains(chains, chain))
         chains.push(chain);
     }
 
@@ -209,15 +196,14 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
         chain ? merge(chain) : add(cell);
 
         function merge (chain) {
-          for (var i = 0; i < chain.length; i++)
-            add(chain.cells[i]);
+          _.each(chain.cells, add);
           Chains.remove(chain);
         }
 
         function add (cell) { cells.push(cell); }
       }
 
-      function contains (cell) { return cells.indexOf(cell) !== -1; }
+      function contains (cell) { return _.contains(cells, cell); }
 
       function get_direction () { return direction; }
 
@@ -258,18 +244,12 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
         for (var j = 0; j < size; j++)
           if (cells[i][j] === cell)
             return {row: i, col: j};
-      return {row: -1, col: -1};
     }
 
     function is_full () { return !get_blank_cells().length; }
 
     function get_blank_cells () {
-      var blanks = [];
-      for (var i = 0; i < size; i++)
-        for (var j = 0; j < size; j++)
-          if (!cells[i][j].owner)
-            blanks.push(cells[i][j]);
-      return blanks;
+      return _.filter(_.flatten(cells), function (cell) {return !cell.owner;});
     }
   }
 });
