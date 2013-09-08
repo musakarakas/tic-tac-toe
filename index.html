@@ -1,41 +1,41 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Tic-Tac-Toe</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" />
-    <link rel="stylesheet" href="style.css" />
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
-    <script src="script.js"></script>
-  </head>
-  <body ng-app="TicTacToe" ng-controller="TicTacToeCtrl">
-    <header>
-      <h1>Tic-Tac-Toe</h1>
-    </header>
-    <article>
-      <div class="main span6">
-        <table class="tic-tac-toe">
-          <tr ng-repeat="row in grid.cells">
-            <td ng-repeat="cell in row" ng-click="game.click(cell)" class="chain-{{chains.longest(cell).length}}">
-              {{cell.owner | uppercase}}
-            </td>
-          </tr>
-        </table>
-      </div>
-      <div class="sidebar span4 offset2">
-        <table class="scoreboard table">
-          <caption>Scoreboard</caption>
-          <tr highlight="x_wins"><td>X wins</td><td>{{scores.x_wins}}</td></tr>
-          <tr highlight="o_wins"><td>O wins</td><td>{{scores.o_wins}}</td></tr>
-          <tr highlight="ties"><td>Ties </td><td>{{scores.ties}}</td></tr>
-        </table>
-        <button class="btn btn-danger btn-block btn-large" ng-click="scores.reset()">
-          <i class="icon-trash icon-white"></i> Reset Scores
-        </button>
-        <button class="btn btn-primary btn-block btn-large" ng-click="game.restart()">
-          <i class="icon-refresh icon-white"></i> Start New Game
-        </button>
-      </div>
-    </article>
-    <footer></footer>
-  </body>
+<head>
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
+  <script src="script.js"></script>
+</head>
+<body ng-app="TicTacToe" ng-controller="TicTacToeCtrl">
+<header>
+  <h1>Tic-Tac-Toe</h1>
+</header>
+<article>
+  <div class="main span6">
+    <table class="tic-tac-toe">
+      <tr ng-repeat="row in grid.cells">
+        <td ng-repeat="cell in row" ng-click="game.click(cell)" class="chain-{{chains.longest(cell).length}}">
+          {{cell.owner | uppercase}}
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="sidebar span4 offset2">
+    <table class="scoreboard table">
+      <caption>Scoreboard</caption>
+      <tr highlight="x_wins"><td>X wins</td><td>{{scores.x_wins}}</td></tr>
+      <tr highlight="o_wins"><td>O wins</td><td>{{scores.o_wins}}</td></tr>
+      <tr highlight="ties"><td>Ties </td><td>{{scores.ties}}</td></tr>
+    </table>
+    <button class="btn btn-danger btn-block btn-large" ng-click="scores.reset()">
+      <i class="icon-trash icon-white"></i> Reset Scores
+    </button>
+    <button class="btn btn-primary btn-block btn-large" ng-click="game.restart()">
+      <i class="icon-refresh icon-white"></i> Start New Game
+    </button>
+  </div>
+</article>
+<footer></footer>
+</body>
 </html>

@@ -220,6 +220,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
       function get_length () {
         return cells.length;
       }
+
       function get_owner () {
         return cells[0].owner;
       }
