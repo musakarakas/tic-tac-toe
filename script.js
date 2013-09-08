@@ -24,7 +24,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
   }
 
   function load_game () {
-    var current_player, result, gameover;
+    var current_player, result, game_over;
 
     init();
     return {
@@ -46,7 +46,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
 
     function reset () {
       current_player = 'x';
-      gameover = false;
+      game_over = false;
       result = '';
       grid = $scope.grid = new Grid(3);
       Chains.reset();
@@ -62,7 +62,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     function end (winner) {
       result = winner ? winner + '_wins' : 'ties';
       Scores[result]++;
-      gameover = true;
+      game_over = true;
     }
 
     function click (cell) {
@@ -70,7 +70,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     }
 
     function play (cell) {
-      if (gameover || cell.owner) return false;
+      if (game_over || cell.owner) return false;
       cell.owner = current_player;
       Chains.digest(cell);
       update_status();
@@ -99,8 +99,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     var random = {
       pick_cell: function () {
         var blanks = grid.get_blank_cells();
-        var cell = blanks[Math.floor(Math.random() * blanks.length)];
-        return cell;
+        return blanks[Math.floor(Math.random() * blanks.length)];
       }
     };
     var defensive = {
