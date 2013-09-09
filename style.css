@@ -1,25 +1,23 @@
-table.tic-tac-toe {
+.tic-tac-toe {
   width: 450px;
   height: 450px;
 }
 
-table.tic-tac-toe td {
+.tic-tac-toe td {
   width: 150px;
   height: 150px;
-  border: thick solid black;
-  background-color: #00c;
-  color: white;
+  border: thick solid #000;
+  background: #00c;
+  color: #fff;
   font-family: "Courier New", Courier, monospace;
   font-size: 72px;
   text-align: center;
-  font-weight: bolder;
+  font-weight: bold;
 }
 
-table.tic-tac-toe td:hover {
-  background-color: #00f;
-}
+.tic-tac-toe td:hover { background: #00f; }
 
-table.tic-tac-toe td.chain-2 { color: #ff0; }
-table.tic-tac-toe td.chain-3 { color: #f00; }
+.tic-tac-toe td.chain-2 { color: #ff0; }
+.tic-tac-toe td.chain-3 { color: #f00; }
 
-tr.highlight { background: #8f8; }
+.scoreboard tr.highlight { background: #8f8; }

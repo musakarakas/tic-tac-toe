@@ -30,9 +30,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     return {
       restart: restart,
       click: click,
-      get result () {
-        return result;
-      }
+      get result () { return result; }
     };
 
     function init () {
@@ -103,8 +101,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
       }
     };
     var defensive = {
-      pick_cell: function () {
-      }
+      pick_cell: function () {}
     };
     return random;
   }
@@ -123,7 +120,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     var chains;
     init();
     return {reset: reset, longest: longest,
-      digest: digest, add: add, remove: remove, find: find};
+      digest: digest, add: add, remove: remove};
 
     function init () {
       reset();
@@ -163,9 +160,10 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     // Binds 'cell1' to 'cell2' with a chain in 'direction'
     function bind (cell1, cell2, direction) {
       if (!cell1 || !cell2 || !cell1.owner || cell1.owner !== cell2.owner)
-        return false;
-      (find(cell1, direction) || new Chain(cell1, direction)).bind(cell2);
-      return true;
+        return;
+      var chain1 = find(cell1, direction) || new Chain(cell1, direction);
+      var chain2 = find(cell2, direction) || new Chain(cell2, direction);
+      chain1.merge(chain2);
     }
 
     function add (chain) {
@@ -180,7 +178,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
 
     function Chain (cell, direction) {
       var cells = this.cells = [cell];
-      this.bind = bind;
+      this.merge = merge;
       this.contains = contains;
 
       Object.defineProperties(this, {
@@ -191,16 +189,9 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
 
       Chains.add(this);
 
-      function bind (cell) {
-        var chain = Chains.find(cell, direction);
-        chain ? merge(chain) : add(cell);
-
-        function merge (chain) {
-          _.each(chain.cells, add);
-          Chains.remove(chain);
-        }
-
-        function add (cell) { cells.push(cell); }
+      function merge (chain) {
+        _.each(chain.cells, function (cell) { cells.push(cell); });
+        Chains.remove(chain);
       }
 
       function contains (cell) { return _.contains(cells, cell); }
@@ -244,6 +235,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
         for (var j = 0; j < size; j++)
           if (cells[i][j] === cell)
             return {row: i, col: j};
+      return {row: -1, col: -1};
     }
 
     function is_full () { return !get_blank_cells().length; }
