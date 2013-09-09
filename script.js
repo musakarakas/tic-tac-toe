@@ -3,9 +3,9 @@ var TicTacToe = angular.module('TicTacToe', []);
 TicTacToe.directive("highlight", function () {
   'use strict';
 
-  return function (scope, element, attrs) {
+  return function (scope, element, attributes) {
     scope.$watch("game.result", function (value) {
-      element.toggleClass('highlight', value === attrs.highlight);
+      element.toggleClass('highlight', value === attributes.highlight);
     });
   };
 });
@@ -13,13 +13,14 @@ TicTacToe.directive("highlight", function () {
 TicTacToe.controller('TicTacToeCtrl', function ($scope) {
   'use strict';
 
-  var AI, Scores, Chains, grid;
+  var AI, Scores, Chains, Grid;
   init();
 
   function init () {
     AI = load_ai();
     Scores = $scope.scores = load_scores();
     Chains = $scope.chains = load_chains();
+    Grid = $scope.grid = load_grid();
     $scope.game = load_game();
   }
 
@@ -46,7 +47,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
       current_player = 'x';
       game_over = false;
       result = '';
-      grid = $scope.grid = new Grid(3);
+      Grid.reset();
       Chains.reset();
     }
 
@@ -82,9 +83,9 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
         longest_length = longest_chain.length;
         winner = longest_chain.owner;
       }
-      if (longest_length === 3)
+      if (longest_length >= 3)
         end(winner);
-      else if (grid.is_full())
+      else if (Grid.is_full())
         end();
     }
 
@@ -96,7 +97,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
   function load_ai () {
     var random = {
       pick_cell: function () {
-        var blanks = grid.get_blank_cells();
+        var blanks = Grid.get_blank_cells();
         return blanks[Math.floor(Math.random() * blanks.length)];
       }
     };
@@ -149,7 +150,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
 
     // Updates chain bindings of cell
     function digest (cell) {
-      var neighbors = grid.get_neighbors_of(cell);
+      var neighbors = Grid.get_neighbors_of(cell);
       for (var i = 0; i < 4; i++) {
         bind(neighbors[i], cell, i);
         bind(cell, neighbors[i + 4], i);
@@ -192,16 +193,24 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     }
   }
 
-  function Grid (size) {
-    var cells = this.cells = [];
-    this.is_full = is_full;
-    this.get_blank_cells = get_blank_cells;
-    this.get_neighbors_of = get_neighbors_of;
+  function load_grid () {
+    var size = 3, cells = [];
+    init();
 
-    for (var i = 0; i < size; i++) {
-      cells[i] = [];
-      for (var j = 0; j < size; j++)
-        cells[i][j] = {owner: null};
+    return {reset: reset, cells: cells, is_full: is_full,
+      get_blank_cells: get_blank_cells, get_neighbors_of: get_neighbors_of};
+
+    function init() {
+      reset();
+    }
+
+    function reset(){
+      cells.length = size;
+      for (var i = 0; i < size; i++) {
+        cells[i] = [];
+        for (var j = 0; j < size; j++)
+          cells[i][j] = {owner: null};
+      }
     }
 
     function get_neighbors_of (cell) {
