@@ -119,8 +119,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
   function load_chains () {
     var chains;
     init();
-    return {reset: reset, longest: longest,
-      digest: digest, add: add, remove: remove};
+    return {reset: reset, longest: longest, digest: digest};
 
     function init () {
       reset();
@@ -161,19 +160,11 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     function bind (cell1, cell2, direction) {
       if (!cell1 || !cell2 || !cell1.owner || cell1.owner !== cell2.owner)
         return;
-      var chain1 = find(cell1, direction) || new Chain(cell1, direction);
+
+      var chain1 = find(cell1, direction);
+      if (!chain1) chains.push(chain1 = new Chain(cell1, direction));
       var chain2 = find(cell2, direction) || new Chain(cell2, direction);
       chain1.merge(chain2);
-    }
-
-    function add (chain) {
-      if (!_.contains(chains, chain))
-        chains.push(chain);
-    }
-
-    function remove (chain) {
-      var i = chains.indexOf(chain);
-      if (i !== -1) chains.splice(i, 1);
     }
 
     function Chain (cell, direction) {
@@ -187,11 +178,8 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
         owner: {get: get_owner}
       });
 
-      Chains.add(this);
-
       function merge (chain) {
         _.each(chain.cells, function (cell) { cells.push(cell); });
-        Chains.remove(chain);
       }
 
       function contains (cell) { return _.contains(cells, cell); }
@@ -235,7 +223,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
         for (var j = 0; j < size; j++)
           if (cells[i][j] === cell)
             return {row: i, col: j};
-      return {row: -1, col: -1};
+      return null;
     }
 
     function is_full () { return !get_blank_cells().length; }
