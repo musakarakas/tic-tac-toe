@@ -2,41 +2,44 @@
 <html>
 <head>
   <title>Tic-Tac-Toe</title>
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css"/>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="style.css"/>
   <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
   <script src="script.js"></script>
 </head>
-<body ng-app="TicTacToe" ng-controller="TicTacToeCtrl">
-<header>
-  <h1>Tic-Tac-Toe</h1>
-</header>
-<article>
-  <div class="main span6">
-    <table class="tic-tac-toe">
-      <tr ng-repeat="row in grid.cells">
-        <td ng-repeat="cell in row" ng-click="game.click(cell)" class="chain-{{chains.longest(cell).length}}">
-          {{cell.owner | uppercase}}
-        </td>
-      </tr>
-    </table>
+<body ng-app="TicTacToe" ng-controller="TicTacToeCtrl" class="resizable-font">
+<div>
+  <div class="grid big-box">
+    <div ng-repeat="cell in grid.cells" ng-click="game.click(cell)"
+         class="cell chain-{{chains.longest(cell).length}}">
+      {{cell.owner | uppercase}}
+    </div>
   </div>
-  <div class="sidebar span4 offset2">
+  <div class="sidebar big-box">
     <table class="scoreboard table">
       <caption>Scoreboard</caption>
       <tr highlight="x_wins"><td>X wins</td><td>{{scores.x_wins}}</td></tr>
       <tr highlight="o_wins"><td>O wins</td><td>{{scores.o_wins}}</td></tr>
       <tr highlight="ties"><td>Ties </td><td>{{scores.ties}}</td></tr>
     </table>
-    <button class="btn btn-danger btn-block btn-large" ng-click="scores.reset()">
-      <i class="icon-trash icon-white"></i> Reset Scores
-    </button>
-    <button class="btn btn-primary btn-block btn-large" ng-click="game.restart()">
-      <i class="icon-refresh icon-white"></i> Start New Game
-    </button>
+    <div class="btn btn-success btn-lg" ng-click="game.restart()">
+      <span class="glyphicon glyphicon-refresh"></span> Start New Game
+    </div>
+    <div class="btn btn-danger btn-lg" ng-click="scores.reset()">
+      <span class="glyphicon glyphicon-trash"></span> Reset scores
+    </div>
+    <div class="btn btn-success btn-lg" ng-click="grid.level_up()">
+      <span class="glyphicon glyphicon-th"></span>
+      <span class="glyphicon glyphicon-arrow-up"></span>
+      Level up
+    </div>
+    <div class="btn btn-success btn-lg" ng-click="grid.level_down()">
+      <span class="glyphicon glyphicon-th-large"></span>
+      <span class="glyphicon glyphicon-arrow-down"></span>
+      Level down
+    </div>
   </div>
-</article>
-<footer></footer>
+</div>
 </body>
 </html>

@@ -1,11 +1,48 @@
 var TicTacToe = angular.module('TicTacToe', []);
 
-TicTacToe.directive("highlight", function () {
+TicTacToe.directive('resizableFont', function () {
   'use strict';
+  return {
+    restrict: 'C',
+    link: function (scope, element, attributes) {
+      scope.$watch('window.size', function (size) {
+        element.css({'font-size': size / 30 + 'px'});
+      });
+    }
+  };
+});
 
+TicTacToe.directive('bigBox', function () {
+  'use strict';
+  return {
+    restrict: 'C',
+    link: function (scope, element, attributes) {
+      scope.$watch('window.size', function (size) {
+        element.css({width: size + 'px', height: size + 'px'});
+      });
+    }
+  };
+});
+
+TicTacToe.directive('cell', function () {
+  'use strict';
+  return {
+    restrict: 'C',
+    link: function (scope, element, attributes) {
+      scope.$watch('grid.size', function (value) {
+        var size = 100 / value - 2 + '%';
+        var font_size = 30 / value + 'em';
+        element.css({width: size, height: size, 'font-size': font_size});
+      });
+    }
+  };
+});
+
+TicTacToe.directive('highlight', function () {
+  'use strict';
   return function (scope, element, attributes) {
-    scope.$watch("game.result", function (value) {
-      element.toggleClass('highlight', value === attributes.highlight);
+    scope.$watch('game.result', function (value) {
+      element.toggleClass('highlight', value === attributes['highlight']);
     });
   };
 });
@@ -13,7 +50,7 @@ TicTacToe.directive("highlight", function () {
 TicTacToe.controller('TicTacToeCtrl', function ($scope) {
   'use strict';
 
-  var AI, Scores, Chains, Grid;
+  var AI, Scores, Chains, Grid, Game;
   init();
 
   function init () {
@@ -21,7 +58,21 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     Scores = $scope.scores = load_scores();
     Chains = $scope.chains = load_chains();
     Grid = $scope.grid = load_grid();
-    $scope.game = load_game();
+    Game = $scope.game = load_game();
+    $scope.window = load_window();
+  }
+
+  function load_window () {
+    var size;
+
+    function resize () {
+      size = Math.min(window.innerWidth, window.innerHeight);
+    }
+
+    window.onresize = function () { $scope.$apply(resize); };
+    resize();
+
+    return { get size () { return size; } };
   }
 
   function load_game () {
@@ -197,14 +248,30 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     var size = 3, cells = [];
     init();
 
-    return {reset: reset, cells: cells, is_full: is_full,
-      get_blank_cells: get_blank_cells, get_neighbors_of: get_neighbors_of};
+    return {reset: reset, is_full: is_full, level_up: level_up, level_down: level_down,
+      get_blank_cells: get_blank_cells, get_neighbors_of: get_neighbors_of,
+      get size () { return size; }, get cells () { return _.flatten(cells); }
+    };
 
-    function init() {
+    function init () {
       reset();
     }
 
-    function reset(){
+    function level_up () {
+      if (size < 10) {
+        size++;
+        Game.restart();
+      }
+    }
+
+    function level_down () {
+      if (size > 3) {
+        size--;
+        Game.restart();
+      }
+    }
+
+    function reset () {
       cells.length = size;
       for (var i = 0; i < size; i++) {
         cells[i] = [];

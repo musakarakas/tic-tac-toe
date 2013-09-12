@@ -1,23 +1,34 @@
-.tic-tac-toe {
-  width: 450px;
-  height: 450px;
+body {
+  margin: 0;
+  padding: 0;
 }
 
-.tic-tac-toe td {
-  width: 150px;
-  height: 150px;
-  border: thick solid #000;
+.grid, .sidebar {
+  float: left;
+}
+
+.grid .cell {
+  float: left;
+  margin: 1%;
   background: #00c;
-  color: #fff;
   font-family: "Courier New", Courier, monospace;
-  font-size: 72px;
   text-align: center;
   font-weight: bold;
+  line-height: 1em;
+  color: #fff;
 }
 
-.tic-tac-toe td:hover { background: #00f; }
+.grid .cell:hover { background: #00f; }
 
-.tic-tac-toe td.chain-2 { color: #ff0; }
-.tic-tac-toe td.chain-3 { color: #f00; }
+.grid .cell.chain-2 { color: #ff0; }
+.grid .cell.chain-3 { color: #f00; }
 
-.scoreboard tr.highlight { background: #8f8; }
+.scoreboard .highlight { background: #8f8; }
+
+.sidebar .btn {
+  display: block;
+  margin: 2%;
+  text-align: left;
+}
+
+.sidebar .btn span { float: right; }
