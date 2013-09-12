@@ -31,7 +31,7 @@ TicTacToe.directive('cell', function () {
     link: function (scope, element, attributes) {
       scope.$watch('grid.size', function (value) {
         var size = 100 / value - 2 + '%';
-        var font_size = 30 / value + 'em';
+        var font_size = 21 / value + 'em';
         element.css({width: size, height: size, 'font-size': font_size});
       });
     }
