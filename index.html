@@ -12,7 +12,7 @@
 <div>
   <div class="grid big-box">
     <div ng-repeat="cell in grid.cells" ng-click="game.click(cell)"
-         class="cell chain-{{chains.longest(cell).length}}">
+         class="cell {{view.classify.cell(cell)}}">
       {{cell.owner | uppercase}}
     </div>
   </div>

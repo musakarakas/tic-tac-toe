@@ -5,7 +5,7 @@ TicTacToe.directive('resizableFont', function () {
   return {
     restrict: 'C',
     link: function (scope, element, attributes) {
-      scope.$watch('window.size', function (size) {
+      scope.$watch('view.window.size', function (size) {
         element.css({'font-size': size / 30 + 'px'});
       });
     }
@@ -17,7 +17,7 @@ TicTacToe.directive('bigBox', function () {
   return {
     restrict: 'C',
     link: function (scope, element, attributes) {
-      scope.$watch('window.size', function (size) {
+      scope.$watch('view.window.size', function (size) {
         element.css({width: size + 'px', height: size + 'px'});
       });
     }
@@ -59,20 +59,35 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
     Chains = $scope.chains = load_chains();
     Grid = $scope.grid = load_grid();
     Game = $scope.game = load_game();
-    $scope.window = load_window();
+    $scope.view = load_view();
   }
 
-  function load_window () {
-    var size;
+  function load_view () {
+    return {window: load_window(), classify: load_classifier()};
 
-    function resize () {
-      size = Math.min(window.innerWidth, window.innerHeight);
+    function load_window () {
+      var size;
+
+      function resize () {
+        size = Math.min(window.innerWidth, window.innerHeight);
+      }
+
+      window.onresize = function () { $scope.$apply(resize); };
+      resize();
+
+      return { get size () { return size; } };
     }
 
-    window.onresize = function () { $scope.$apply(resize); };
-    resize();
+    function load_classifier () {
+      return {cell: classify_cell};
 
-    return { get size () { return size; } };
+      function classify_cell (cell) {
+        var longest = Chains.longest(cell);
+        var length = longest ? longest.length : 0;
+        if (length < 2) return '';
+        return length > 2 ? 'chain-long' : 'chain-short';
+      }
+    }
   }
 
   function load_game () {

@@ -20,8 +20,8 @@ body {
 
 .grid .cell:hover { background: #00f; }
 
-.grid .cell.chain-2 { color: #ff0; }
-.grid .cell.chain-3 { color: #f00; }
+.grid .cell.chain-short { color: #ff0; }
+.grid .cell.chain-long { color: #f00; }
 
 .scoreboard .highlight { background: #8f8; }
 
