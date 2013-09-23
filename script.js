@@ -162,10 +162,7 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
 
   function load_ai () {
     var random = {
-      pick_cell: function () {
-        var blanks = Grid.get_blank_cells();
-        return blanks[Math.floor(Math.random() * blanks.length)];
-      }
+      pick_cell: function () { return _.sample(Grid.get_blank_cells()); }
     };
     var defensive = {
       pick_cell: function () {}
