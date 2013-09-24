@@ -17,11 +17,10 @@
     </div>
   </div>
   <div class="sidebar big-box">
-    <table class="scoreboard table">
-      <caption>Scoreboard</caption>
+    <table class="scoreboard">
       <tr highlight="x_wins"><td>X wins</td><td>{{scores.x_wins}}</td></tr>
       <tr highlight="o_wins"><td>O wins</td><td>{{scores.o_wins}}</td></tr>
-      <tr highlight="ties"><td>Ties </td><td>{{scores.ties}}</td></tr>
+      <tr highlight="ties"><td>Ties</td><td>{{scores.ties}}</td></tr>
     </table>
     <div class="btn btn-success btn-lg" ng-click="game.restart()">
       <span class="glyphicon glyphicon-refresh"></span> Start New Game

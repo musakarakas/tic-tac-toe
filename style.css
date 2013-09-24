@@ -23,11 +23,17 @@ body {
 .grid .cell.chain-short { color: #ff0; }
 .grid .cell.chain-long { color: #f00; }
 
+.sidebar { font-size: 1.5em; }
+.sidebar * { font-size: 1em; }
+
+.scoreboard { width: 100%; }
+.scoreboard tr { border-top: 1px solid #ddd; }
 .scoreboard .highlight { background: #8f8; }
 
 .sidebar .btn {
   display: block;
   margin: 2%;
+  padding: 2%;
   text-align: left;
 }
 

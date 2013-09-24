@@ -69,7 +69,9 @@ TicTacToe.controller('TicTacToeCtrl', function ($scope) {
       var size;
 
       function resize () {
-        size = Math.min(window.innerWidth, window.innerHeight);
+        var hw = window.innerWidth / 2, hh = window.innerHeight, hm = Math.min(hw, hh);
+        var vw = window.innerWidth, vh = window.innerHeight / 2, vm = Math.min(vw, vh);
+        size = Math.max(hm, vm) * 0.96;
       }
 
       window.onresize = function () { $scope.$apply(resize); };
